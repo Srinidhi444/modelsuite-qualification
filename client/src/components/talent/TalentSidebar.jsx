@@ -103,8 +103,8 @@ const TalentSidebar = () => {
         </div>
 
         <button
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await logout();
             navigate('/login');
           }}
           className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 transition-all duration-200"
