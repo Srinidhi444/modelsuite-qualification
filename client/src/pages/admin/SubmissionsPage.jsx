@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Sidebar from '../../components/admin/Sidebar';
 import SubmissionReviewModal from '../../components/admin/SubmissionReviewModal';
 import { fetchAllSubmissions } from '../../api/submissions';
+import { formatDate } from '../../utils/formatDate';
 
 const REVIEW_STATUS_CLASS = {
   Pending:  'status-badge-Submitted',
@@ -130,7 +131,7 @@ const SubmissionsPage = () => {
 
                       {/* Submitted at — raw ISO */}
                       <td className={`${tdCls} text-text-muted text-[13px] whitespace-nowrap`}>
-                        {sub.createdAt}
+                        {formatDate(sub.createdAt)}
                       </td>
 
                       {/* Review status */}

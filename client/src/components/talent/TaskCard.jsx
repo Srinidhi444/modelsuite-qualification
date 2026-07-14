@@ -1,5 +1,5 @@
 ﻿import { claimTask } from '../../api/talent';
-
+import { formatDate } from '../../utils/formatDate';
 const STATUS_CLASS = {
   Open:      'status-badge-Open',
   Claimed:   'status-badge-Claimed',
@@ -41,7 +41,7 @@ const TaskCard = ({ task, showClaimButton = false, onClaimed }) => {
       <div className="flex items-center justify-between flex-wrap gap-2 mt-auto">
         
         <span className="text-[12px] text-text-faint">
-          {task.dueDate ? `Due: ${task.dueDate}` : 'No due date'}
+          {task.dueDate ? `Due: ${formatDate(task.dueDate)}` : 'No due date'}
         </span>
         {task.createdBy?.name && (
           <span className="text-[12px] text-text-faint">By {task.createdBy.name}</span>

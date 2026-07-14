@@ -1,8 +1,8 @@
 ﻿const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const generateToken = (id, role, tokenVersion) => {
+  return jwt.sign({ id, role, tokenVersion }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 // @desc  Register a new user
@@ -29,7 +29,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token: generateToken(user._id, user.role),
+      token: generateToken(user._id, user.role, user.tokenVersion),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -51,7 +51,7 @@ const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id, user.role),
+        token: generateToken(user._id, user.role, user.tokenVersion),
       });
     } else {
       // — less secure but also unhelpful UX
@@ -61,5 +61,16 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const logoutUser = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { tokenVersion: 1 },
+    });
 
-module.exports = { registerUser, loginUser };
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, logoutUser };

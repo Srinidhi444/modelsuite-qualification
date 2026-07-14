@@ -1,16 +1,31 @@
 ﻿const Task = require('../models/Task');
+const Submission = require("../models/Submission");
 
 // @desc  Get all tasks
 // @route GET /api/tasks
 // @access Admin
 const getAllTasks = async (req, res) => {
   try {
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+    const skip = (page - 1) * limit;
+
+    const totalTasks = await Task.countDocuments();
+
     const tasks = await Task.find({})
       .populate('assignedTo', 'name email')
       .populate('createdBy', 'name')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json(tasks);
+    res.json({
+      tasks,
+      page,
+      limit,
+      totalTasks,
+      totalPages: Math.ceil(totalTasks / limit),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -83,7 +98,8 @@ const deleteTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
-    // — orphaned Submission documents remain in DB after task deletion
+    // delete all submissions for this task first to avoid orphaned submissions
+    await Submission.deleteMany({ taskId: req.params.id });
     await Task.findByIdAndDelete(req.params.id);
 
     res.json({ message: 'Task deleted' });

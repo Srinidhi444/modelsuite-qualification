@@ -1,5 +1,5 @@
 import { deleteTask } from '../../api/tasks';
-
+import { formatDate } from '../../utils/formatDate';
 /* ── SVG Action Icons ── */
 const IconEdit = () => (
   <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -22,15 +22,7 @@ const AVATAR_COLORS = [
 ];
 const getAvatarGradient = (name = '') => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
-/* ── Date formatter ── */
-const fmtDate = (raw) => {
-  if (!raw) return '—';
-  try {
-    const d = new Date(raw);
-    if (isNaN(d)) return raw;
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch { return raw; }
-};
+
 
 /* ── Status badge class ── */
 const STATUS_CLASS = {
@@ -127,12 +119,12 @@ const TasksTable = ({ tasks, onEdit, onRefresh }) => {
 
               {/* Due date */}
               <td className="table-td" style={{ color: '#6B7280', whiteSpace: 'nowrap' }}>
-                {fmtDate(task.dueDate)}
+                {formatDate(task.dueDate)}
               </td>
 
               {/* Created */}
               <td className="table-td" style={{ color: '#4B5563', whiteSpace: 'nowrap', fontSize: '12.5px' }}>
-                {fmtDate(task.createdAt)}
+                {formatDate(task.createdAt)}
               </td>
 
               {/* Actions */}
