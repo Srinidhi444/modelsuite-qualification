@@ -34,11 +34,9 @@ const AdminDashboard = () => {
   const [totalTasks, setTotalTasks] = useState(0);
   const [limit, setLimit] = useState(10);
 
-
   const loadTasks = async (currentPage = page, currentLimit = limit) => {
     try {
       const { data } = await fetchAllTasks(currentPage, currentLimit);
-
 
       setTasks(data.tasks);
       setPage(data.page);
@@ -50,12 +48,33 @@ const AdminDashboard = () => {
     }
   };
 
-
-  // eslint-disable-next-line
   useEffect(() => {
-    loadTasks(page, limit);
-  }, [page, limit]);
+    let ignore = false;
 
+    const run = async () => {
+      try {
+        const { data } = await fetchAllTasks(page, limit);
+
+        if (ignore) return;
+
+        setTasks(data.tasks);
+        setPage(data.page);
+        setLimit(data.limit);
+        setTotalPages(data.totalPages);
+        setTotalTasks(data.totalTasks);
+      } catch {
+        if (!ignore) {
+          alert('Failed to load tasks');
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      ignore = true;
+    };
+  }, [page, limit]);
 
   const stats = {
     total: totalTasks,
@@ -64,7 +83,6 @@ const AdminDashboard = () => {
     approved: tasks.filter((t) => t.status === 'Approved').length,
   };
 
-
   const statCards = [
     { label: 'Total Tasks', value: stats.total, colorClass: 'stat-card-default', valueColor: '#E5E2E1' },
     { label: 'Open', value: stats.open, colorClass: 'stat-card-blue', valueColor: '#60A5FA' },
@@ -72,21 +90,19 @@ const AdminDashboard = () => {
     { label: 'Approved', value: stats.approved, colorClass: 'stat-card-green', valueColor: '#34D399' },
   ];
 
-
-  /* Filter tasks */
   const filteredTasks = tasks.filter((t) => {
-    const matchSearch = !search ||
+    const matchSearch =
+      !search ||
       t.title?.toLowerCase().includes(search.toLowerCase()) ||
       t.assignedTo?.name?.toLowerCase().includes(search.toLowerCase());
+
     const matchStatus = statusFilter === 'All' || t.status === statusFilter;
     return matchSearch && matchStatus;
   });
 
-
   return (
     <div className="flex min-h-screen" style={{ background: '#050505' }}>
       <Sidebar />
-
 
       <main className="ml-[240px] flex-1 px-8 py-8" style={{ maxWidth: 'calc(100vw - 240px)' }}>
         {/* Page header */}
@@ -103,7 +119,6 @@ const AdminDashboard = () => {
             </p>
           </div>
 
-
           <button
             onClick={() => setShowCreate(true)}
             className="btn-gradient flex items-center gap-2 px-4 py-2.5 rounded-[10px] text-[13px] font-semibold cursor-pointer font-sans"
@@ -112,7 +127,6 @@ const AdminDashboard = () => {
             Create Task
           </button>
         </div>
-
 
         {/* Stats grid */}
         <div className="grid grid-cols-4 gap-4 mb-6 page-section">
@@ -133,7 +147,6 @@ const AdminDashboard = () => {
             </div>
           ))}
         </div>
-
 
         {/* Tasks table */}
         <div className="tasks-container page-section">
@@ -159,7 +172,6 @@ const AdminDashboard = () => {
               </span>
             </div>
 
-
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Search */}
               <div className="relative">
@@ -179,7 +191,6 @@ const AdminDashboard = () => {
                 />
               </div>
 
-
               {/* Status filter */}
               <select
                 value={statusFilter}
@@ -197,12 +208,10 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-
           <TasksTable tasks={filteredTasks} onEdit={setEditTask} onRefresh={loadTasks} />
 
           {/* Pagination */}
           <div className="flex items-center justify-between mt-5 border-t border-white/10 pt-4">
-            {/* Left side */}
             <div className="flex items-center gap-4">
               <span
                 className="text-[13px]"
@@ -248,7 +257,6 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Right side */}
             <div className="flex items-center gap-1.5">
               <button
                 disabled={page === 1}
@@ -292,7 +300,6 @@ const AdminDashboard = () => {
         </div>
       </main>
 
-
       {showCreate && (
         <CreateTaskModal onClose={() => setShowCreate(false)} onCreated={loadTasks} />
       )}
@@ -309,6 +316,5 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
 
 export default AdminDashboard;

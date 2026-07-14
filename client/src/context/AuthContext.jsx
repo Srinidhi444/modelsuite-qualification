@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await API.post('/auth/logout');
-    } catch (_) {
+    } catch  {
       // Ignore logout errors and clear local session
     } finally {
       localStorage.removeItem('user');
